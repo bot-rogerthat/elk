@@ -1,6 +1,7 @@
 # elk
 Scope: Using 3 different Docker images (official Elastic docker images) 
 - Step 1: Setup Elasticsearch container and verify elastic its working 
+
 docker-machine ssh 
 
 sudo sysctl -w vm.max_map_count=262144

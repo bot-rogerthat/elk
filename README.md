@@ -6,13 +6,13 @@ docker-machine ssh
 
 sudo sysctl -w vm.max_map_count=262144
 
-docker run -d -p 9200:9200 -p 9300:9300 -it -h elasticsearch --name elasticsearch elasticsearch 
+docker run -d -p 9200:9200 -p 9300:9300 -it -h elasticsearch --name elasticsearch elasticsearch:6.4.1
 
 curl http://localhost:9200/ 
 
 - Step 2: Setup Kibana container https://www.elastic.co/guide/en/logst... 
 
-docker run -d -p 5601:5601 -h kibana --name kibana --link elasticsearch:elasticsearch kibana 
+docker run -d -p 5601:5601 -h kibana --name kibana --link elasticsearch:elasticsearch kibana:6.4.1 
 
 curl http://localhost:9200/_cat/indices 
 

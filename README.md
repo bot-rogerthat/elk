@@ -1,6 +1,4 @@
-# elk
-# docker
-# windows 10
+# elk docker windows 10
 Scope: Using 3 different Docker images (official Elastic docker images) 
 - Step 1: Setup Elasticsearch container and verify elastic its working 
 
@@ -20,7 +18,7 @@ curl http://localhost:9200/_cat/indices
 
 - Step 3: Create logstash config file and use it to setup Logstash container 
 
-docker run -h logstash --name logstash --link elasticsearch:elasticsearch -it --rm -v "$PWD":/config-dir logstash -f /config-dir/logstash.conf 
+docker run -h logstash --name logstash --link elasticsearch:elasticsearch -it --rm -v "$PWD":\config-dir logstash -f /config-dir/logstash.conf 
 
 input { stdin { } }
 output {

@@ -1,0 +1,101 @@
+https://www.youtube.com/watch?v=RV0845KmsNI&t=6s
+https://docs.gitlab.com/runner/register/index.html
+https://www.howtoforge.com/tutorial/how-to-install-sonarqube-on-ubuntu-1804/
+https://gitlab.talanlabs.com/gabriel-allaigre/sonar-gitlab-plugin
+https://github.com/gabrie-allaigre/sonar-gitlab-plugin
+---
+image: docker
+
+services:
+  - docker:stable-dind
+
+stages:
+  - build
+  - unit-test
+  - quality
+  - acceptance-test
+
+.only-default: &only-default
+  only:
+    - merge_requests
+
+build:
+  stage: build
+  <<: *only-default
+  script:
+    - echo "run build"
+    - mvn package -Dmaven.test.skip=true
+
+unit-test:
+  stage: unit-test
+  <<: *only-default
+  script:
+      - echo "run unit-test"
+      - mvn test
+
+quality:
+  stage: quality
+  <<: *only-default
+  script:
+    - echo "run quality"
+    - mvn sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.java.binaries=target/
+
+acceptance-test:
+  stage: acceptance-test
+  <<: *only-default
+  script:
+      - echo "run acceptance-test"
+      - mvn test -Dtest=acceptance.SimpleMSSQLServerTest
+      
+# sonarqube_master_job:
+#   stage: test
+#   only:
+#     - master
+#   script:
+#     - mvn --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.gitlab.project_id=$CI_PROJECT_PATH -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME -Dsonar.gitlab.json_mode=CODECLIMATE -Dsonar.gitlab.failure_notification_mode=commit-status
+#   artifacts:
+#     expire_in: 1 day
+#     paths:
+#       - codeclimate.json
+
+# sonarqube_preview_feature_job:
+#   stage: test
+#   only:
+#     - /^develop\/*/
+#   script:
+#     - git checkout origin/master
+#     - git merge $CI_COMMIT_SHA --no-commit --no-ff
+#     - mvn --batch-mode verify sonar:sonar -Dsonar.host.url=$SONAR_URL -Dsonar.login=$SONAR_LOGIN -Dsonar.analysis.mode=preview -Dsonar.gitlab.project_id=$CI_PROJECT_PATH -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME -Dsonar.gitlab.json_mode=CODECLIMATE -Dsonar.gitlab.failure_notification_mode=commit-status
+#   artifacts:
+#     expire_in: 1 day
+#     paths:
+#       - codeclimate.json
+
+#codequality:
+#  stage: quality
+#  variables:
+#    GIT_STRATEGY: none
+#  script:
+#    - echo ok
+#  artifacts:
+#    paths:
+#      - codeclimate.json
+	  
+---
+ <plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-surefire-plugin</artifactId>
+    <version>3.0.0-M3</version>
+    <configuration>
+        <excludes>
+            <exclude>**/acceptance/*</exclude>
+        </excludes>
+    </configuration>
+ </plugin>
+ <plugin>
+  <groupId>org.sonarsource.scanner.maven</groupId>
+  <artifactId>sonar-maven-plugin</artifactId>
+  <version>3.6.0.1398</version>
+ </plugin>
+
+      
